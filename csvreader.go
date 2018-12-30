@@ -27,7 +27,7 @@ func (csvReaer *CSVReader) textRead(fp *os.File) ([][]string, error) {
   reader.LazyQuotes = true
   records, err := reader.ReadAll()
   if err != nil {
-    return nil, errors.New("not read csv")
+    return nil, errors.New("could not read the csv file")
   }
 
   return records, nil

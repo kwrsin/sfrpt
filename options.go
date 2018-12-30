@@ -18,6 +18,7 @@ type Options struct {
 }
 
 type Option struct {
+  Input []string `json:"input"`
   Division_separator string `json:"division_separator"`
   Join_separator string `json:"join_separator"`
   Data_path string `json:"data_path"`

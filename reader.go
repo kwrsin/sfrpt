@@ -6,6 +6,17 @@ import (
   "strconv"
 )
 
+const (
+  TITLE_PAIR = "PAIR"
+  TITLE_DATE = "DATE"
+  TITLE_TIME = "TIME"
+  TITLE_OPEN = "OPEN"
+  TITLE_HIGH = "HIGH"
+  TITLE_LOW = "LOW"
+  TITLE_CLOSE = "CLOSE"
+  TITLE_VOL = "VOL"
+)
+
 type Bar struct {
   symbol string
   date string
@@ -41,42 +52,80 @@ func readData(data_path string, textReader TextReader) ([][]string, error) {
   return data, nil
 }
 
-func toBar(record []string) (*Bar, error) {
+func getIndex(search string, titles []string) int {
+  for i, title := range titles {
+    switch {
+    case search == title:
+      return i
+    }
+  }
+  return -1
+}
+
+func toBar(record []string, titles []string) (*Bar, error) {
+  var iPair, iDate, iTime, iOpen, iHigh, iLow, iClose, iVol int
+
+  iPair = getIndex(TITLE_PAIR, titles)
+  iDate = getIndex(TITLE_DATE, titles)
+  iTime = getIndex(TITLE_TIME, titles)
+  iOpen = getIndex(TITLE_OPEN, titles)
+  iHigh = getIndex(TITLE_HIGH, titles)
+  iLow = getIndex(TITLE_LOW, titles)
+  iClose = getIndex(TITLE_CLOSE, titles)
+  iVol = getIndex(TITLE_VOL, titles)
+
   bar := new(Bar)
-  bar.symbol = record[0]
-  bar.date = record[1]
-  bar.time = record[2]
-  open, err_open := strconv.ParseFloat(record[3], 64)
-  bar.open = open
+  if iPair >= 0 {bar.symbol = record[iPair]}
+  if iDate >= 0 {bar.date = record[iDate]}
+  if iTime >= 0 {bar.time = record[iTime]}
+  if iOpen >= 0 {
+    price, err := strconv.ParseFloat(record[iOpen], 64)
+    if err != nil {
+      return nil, errors.New("converting error[OPEN]")
+    }
+    bar.open = price
+  }
 
-  high, err_high := strconv.ParseFloat(record[4], 64)
-  bar.high = high
+  if iHigh >= 0 {
+    price, err := strconv.ParseFloat(record[iHigh], 64)
+    if err != nil {
+      return nil, errors.New("converting error[HIGH]")
+    }
+    bar.high = price
+  }
 
-  low, err_low := strconv.ParseFloat(record[5], 64)
-  bar.low = low
+  if iLow >= 0 {
+    price, err := strconv.ParseFloat(record[iLow], 64)
+    if err != nil {
+      return nil, errors.New("converting error[LOW]")
+    }
+    bar.low = price
+  }
 
-  clos, err_close := strconv.ParseFloat(record[6], 64)
-  bar.close = clos
+  if iClose >= 0 {
+    price, err := strconv.ParseFloat(record[iClose], 64)
+    if err != nil {
+      return nil, errors.New("converting error[CLOSE]")
+    }
+    bar.close = price
+  }
 
-  vol, err_vol := strconv.ParseFloat(record[7], 64)
-  bar.vol = vol
-
-  if err_open != nil ||
-     err_high != nil ||
-     err_low != nil ||
-     err_close != nil ||
-     err_vol != nil {
-    return nil, errors.New("bar converting error")
+  if iVol >= 0 {
+    price, err := strconv.ParseFloat(record[iVol], 64)
+    if err != nil {
+      return nil, errors.New("converting error[VOL]")
+    }
+    bar.vol = price
   }
 
   return bar, nil
 }
 
-func toBars(records [][]string) []*Bar {
+func toBars(records [][]string, titles []string) []*Bar {
   Println("converting csv records to bars...")
   bars := make([]*Bar, 0, len(records))
   for i, record := range records {
-    bar, err := toBar(record)
+    bar, err := toBar(record, titles)
     if err != nil {
       Printf("%d line, %v\n", i, err)
       continue
@@ -94,7 +143,7 @@ func GetData(options *Options) ([]*Bar, error) {
   if err !=  nil {
     return nil, errors.New("csv reading error")
   }
-  bars := toBars(records)
+  bars := toBars(records, options.Options.Input)
 
   return bars, nil
 }

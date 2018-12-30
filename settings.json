@@ -1,5 +1,15 @@
 {
   "options": {
+    "input": [
+      "PAIR",
+      "DATE",
+      "TIME",
+      "OPEN",
+      "HIGH",
+      "LOW",
+      "CLOSE",
+      "VOL"
+    ],
     "division_separator": ",",
     "join_separator": ",",
     "data_path": "sample.txt"
