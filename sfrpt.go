@@ -8,6 +8,4 @@ func main() {
     panic(err)
   }
   report(bars, options)
-  //TODO: goroutine１行処理 reporter
-  //TODO: View
 }
