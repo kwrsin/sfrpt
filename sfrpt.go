@@ -7,6 +7,7 @@ func main() {
   if err != nil {
     panic(err)
   }
-  Printf("%v", bars)
-  //TODO: goroutine１行処理
+  report(bars, options)
+  //TODO: goroutine１行処理 reporter
+  //TODO: View
 }
